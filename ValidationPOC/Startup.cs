@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ValidationPOC.BL;
 using ValidationPOC.ValidationService;
 
 namespace ValidationPOC
@@ -36,6 +37,7 @@ namespace ValidationPOC
             services.AddControllers();
 
             services.AddTransient<IValidationService, ValidationService.ValidationService>();
+            services.AddTransient<IForecastService,ForecastService >();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ValidationPOC", Version = "v1" });

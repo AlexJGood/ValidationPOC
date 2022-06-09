@@ -15,7 +15,7 @@ namespace ValidationPOC.ValidationService
             this._objectModelValidator = objectModelValidator;
         }
 
-        public IDictionary<string,string[]> Validate<T>(T item) where T : class
+        public ValidationResponse Validate<T>(T item) where T : class
         {
             var validationResults = new Dictionary<string, string[]>();
 
@@ -33,7 +33,10 @@ namespace ValidationPOC.ValidationService
                 );
             }
 
-            return validationResults;
+            var validationResponse = new ValidationResponse();
+            validationResponse.IsValid = actionContext.ModelState.IsValid;
+            validationResponse.ValidationResults = validationResults;
+            return validationResponse;
         }
     }
 }

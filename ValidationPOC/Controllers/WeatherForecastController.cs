@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using ValidationPOC.BL;
 using ValidationPOC.Domain;
 using ValidationPOC.Model;
 using ValidationPOC.ValidationService;
@@ -18,11 +14,12 @@ namespace ValidationPOC.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly ILogger<WeatherForecastController> _logger;
+        readonly IForecastService _forecastService;
         readonly IValidationService _validationService;
 
-        public WeatherForecastController( ILogger<WeatherForecastController> logger, IValidationService validationService)
+        public WeatherForecastController( ILogger<WeatherForecastController> logger, IForecastService forecastService)
         {
-            this._validationService = validationService;
+            this._forecastService = forecastService;
             _logger = logger;
         }
         private static readonly string[] Summaries = new[]
@@ -81,11 +78,11 @@ namespace ValidationPOC.Controllers
                 }).ToArray()
             };
 
-            var validationErrors = this._validationService.Validate(forecast);
-                        
-            if (validationErrors.Count > 0)
+            var operationResult = _forecastService.Update(forecast);
+
+            if (!operationResult.Success && !operationResult.ValidationResult.IsValid)
             {
-                var problem = new ValidationProblemDetails(validationErrors);
+                var problem = new ValidationProblemDetails(operationResult.ValidationResult.ValidationResults);
                 problem.Status = 400;
                 problem.Title = "There are some issues with your request";
                 return BadRequest(problem);
